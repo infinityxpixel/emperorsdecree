@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Emperor's Final Decree | Split, Croatia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Fauna+One&display=swap');
+
+        :root {
+            --roman-gold: #d4af37;
+            --roman-stone: #e2e2d5;
+            --roman-red: #8b0000;
+            --deep-black: #0a0a0a;
+        }
+
+        body {
+            background-color: var(--deep-black);
+            color: var(--roman-stone);
+            font-family: 'Fauna One', serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .cinzel { font-family: 'Cinzel', serif; }
+
+        /* Parchment Styling */
+        .parchment {
+            background: #f4e4bc;
+            background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png");
+            color: #1a1a1a;
+            border: 2px solid var(--roman-gold);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        /* Roman Button Styling */
+        .btn-roman {
+            background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+            color: white;
+            border: 1px solid var(--roman-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Cinzel', serif;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(139, 0, 0, 0.4);
+        }
+
+        .btn-roman:active {
+            transform: scale(0.96);
+            filter: brightness(1.2);
+        }
+
+        /* Quest Card Styling */
+        .quest-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid var(--roman-gold);
+            transition: all 0.3s ease;
+        }
+
+        .quest-card.completed {
+            border-left-color: #22c55e;
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .quest-card.locked {
+            opacity: 0.4;
+            filter: grayscale(1);
+        }
+
+        /* Animation for gold glow */
+        .glow-gold {
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Certificate */
+        .cert-border {
+            border: 15px double var(--roman-red);
+            padding: 30px 15px;
+            background: #fdfaf3;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header Section -->
+    <header class="sticky top-0 z-30 bg-black/80 backdrop-blur-md border-b border-yellow-900/50 p-4 shadow-xl">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <h1 class="cinzel text-xl font-bold text-yellow-600 tracking-tighter">Diocletian's Decree</h1>
+            <div id="progress-indicator" class="text-xs cinzel text-yellow-500 font-bold bg-yellow-900/30 px-3 py-1 rounded-full border border-yellow-700/50">
+                0 / 7 LEGIONS
+            </div>
+        </div>
+    </header>
+
+    <main id="main-view" class="max-w-md mx-auto p-4 pb-32">
+        <!-- Start Screen -->
+        <div id="screen-start" class="py-12 text-center space-y-8 animate-in fade-in duration-700">
+            <div class="relative inline-block">
+                <i class="fa-solid fa-helmet-recreant text-8xl text-yellow-600 glow-gold"></i>
+                <div class="absolute -bottom-2 -right-2 bg-red-700 p-2 rounded-full border-2 border-yellow-600">
+                    <i class="fa-solid fa-scroll text-xl text-white"></i>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <h2 class="cinzel text-4xl font-bold leading-tight uppercase">Enter the <br><span class="text-yellow-600">Labyrinth</span></h2>
+                <p class="text-stone-400 leading-relaxed italic">
+                    Soldier, the Emperor has abdicated, but his Final Decree remains hidden within the stone veins of Split. Prove your worth or perish in the cellars.
+                </p>
+            </div>
+
+            <button onclick="app.startHunt()" class="btn-roman w-full py-5 rounded-lg text-lg font-bold shadow-2xl">
+                Begin the Campaign
+            </button>
+        </div>
+
+        <!-- Quest List -->
+        <div id="screen-quests" class="hidden space-y-4">
+            <div id="quest-container" class="space-y-4">
+                <!-- Quests injected here -->
+            </div>
+        </div>
+
+        <!-- Certificate Form -->
+        <div id="screen-claim" class="hidden py-10">
+            <div class="parchment p-8 text-center space-y-6">
+                <h2 class="cinzel text-3xl font-bold uppercase text-red-900">Campaign Victory</h2>
+                <p class="text-stone-800 italic">You have conquered the Palace. State your name to be etched into the eternal stone of Split.</p>
+                <input type="text" id="player-name" placeholder="YOUR NAME" class="w-full bg-white/50 border-b-2 border-red-900 p-4 text-2xl cinzel text-center focus:outline-none placeholder-stone-500 text-black">
+                <button onclick="app.generateCertificate()" class="btn-roman w-full py-4 rounded font-bold shadow-lg">
+                    Generate Decree
+                </button>
+            </div>
+        </div>
+
+        <!-- Final Certificate -->
+        <div id="screen-certificate" class="hidden py-4 animate-in zoom-in duration-500">
+            <div class="cert-border parchment text-center text-black">
+                <p class="text-[10px] cinzel tracking-widest text-red-800 mb-2">REPUBLIC OF CROATIA • CITY OF SPLIT</p>
+                <h2 class="text-2xl font-bold cinzel mb-6 border-b border-black/20 pb-2">Imperial Decree</h2>
+                <p class="text-xs italic mb-4">Be it known to all that</p>
+                <h3 id="display-name" class="text-3xl font-bold cinzel text-red-900 mb-6 uppercase tracking-wider">MARCUS AURELIUS</h3>
+                <p class="text-sm px-4 leading-relaxed mb-8 italic">
+                    Has successfully navigated the stone labyrinth of Diocletian's Palace, solved the seven riddles of antiquity, and ascended the hills of Marjan. They are hereby granted the title of <strong>"Honorary Guardian of Split."</strong>
+                </p>
+                <div class="flex justify-between items-center px-6 opacity-80">
+                    <div class="text-center">
+                        <i class="fa-solid fa-stamp text-3xl mb-1 text-red-900"></i>
+                        <p class="text-[8px] cinzel">OFFICIAL SEAL</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="cinzel text-[10px] border-b border-black">Diocletianus Augustus</p>
+                        <p class="text-[8px]">EMPEROR OF ROME</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="location.reload()" class="w-full mt-8 text-yellow-700 cinzel font-bold text-sm tracking-widest">
+                <i class="fa-solid fa-rotate-left mr-2"></i> Restart Campaign
+            </button>
+        </div>
+    </main>
+
+    <!-- Challenge Modal -->
+    <div id="challenge-modal" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+        <div class="parchment w-full max-w-sm rounded-xl p-6 relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4">
+                <button onclick="app.closeModal()" class="text-black/50 hover:text-black text-2xl">&times;</button>
+            </div>
+            
+            <div class="mb-6">
+                <span id="modal-loc" class="text-[10px] uppercase tracking-widest text-red-800 font-bold">Location</span>
+                <h2 id="modal-title" class="cinzel text-xl font-bold text-black border-b border-black/10 pb-2">Quest Title</h2>
+            </div>
+
+            <div id="modal-desc" class="text-stone-800 italic text-sm mb-6 leading-relaxed">
+                Clue text goes here...
+            </div>
+
+            <div class="bg-black/5 p-4 rounded-lg space-y-4">
+                <label id="modal-question" class="block text-[10px] font-bold text-black uppercase tracking-wider">Verification Question</label>
+                <input type="text" id="answer-input" autocomplete="off" class="w-full p-3 bg-white border border-stone-400 rounded text-black focus:ring-2 focus:ring-red-800 transition-all uppercase placeholder:italic" placeholder="Your discovery...">
+                <p id="error-txt" class="text-red-700 text-[10px] font-bold hidden uppercase"><i class="fa-solid fa-circle-exclamation"></i> Incorrect. Observe the monument closely.</p>
+            </div>
+
+            <button onclick="app.verifyAnswer()" class="btn-roman w-full mt-6 py-4 rounded-lg font-bold shadow-md">
+                Verify Proof
+            </button>
+        </div>
+    </div>
+
+    <!-- Background Decoration -->
+    <div class="fixed bottom-0 right-0 -z-10 opacity-10 pointer-events-none">
+        <i class="fa-solid fa-columns-3 text-[300px]"></i>
+    </div>
+
+    <script>
+        const app = {
+            quests: [
+                {
+                    id: 0,
+                    title: "The Giant's Wish",
+                    loc: "Statue of Gregory of Nin",
+                    clue: "Seek the bronze giant at the North Gate. Millions have rubbed one specific body part into a golden glow for good luck.",
+                    q: "What specific body part is polished gold?",
+                    ans: "toe",
+                    icon: "fa-shoe-prints"
+                },
+                {
+                    id: 1,
+                    title: "Acoustic Whisper",
+                    loc: "The Vestibul",
+                    clue: "Stand in the circular entry where the sky is your roof. Look at the compass rose beneath your feet.",
+                    q: "What pattern is found on the floor center?",
+                    ans: "compass",
+                    icon: "fa-ear-listen"
+                },
+                {
+                    id: 2,
+                    title: "Guardian of Giza",
+                    loc: "Peristyle Square",
+                    clue: "Find the black guardian brought from the Nile. It is carved from a hard, dark volcanic stone.",
+                    q: "The Sphinx is carved from black...?",
+                    ans: "granite",
+                    icon: "fa-cat"
+                },
+                {
+                    id: 3,
+                    title: "The Lovers' Squeeze",
+                    loc: "Let Me Pass Street",
+                    clue: "Find the street so narrow that two people cannot pass without touching. It sits next to a specific temple.",
+                    q: "Which God's temple is located here?",
+                    ans: "jupiter",
+                    icon: "fa-arrows-left-right"
+                },
+                {
+                    id: 4,
+                    title: "Dragon's Lair",
+                    loc: "The Cellars",
+                    clue: "Descend into the Roman substructures where merchants trade. Find the name of the Emperor's wife.",
+                    q: "What was the name of the Empress?",
+                    ans: "prisca",
+                    icon: "fa-dragon"
+                },
+                {
+                    id: 5,
+                    title: "The Olympian Riva",
+                    loc: "Riva Promenade",
+                    clue: "Find the brass plaques of Split's sports heroes. Locate tennis legend Goran Ivanišević.",
+                    q: "In what year did he win Wimbledon?",
+                    ans: "2001",
+                    icon: "fa-medal"
+                },
+                {
+                    id: 6,
+                    title: "The Final Ascent",
+                    loc: "Marjan Viewpoint",
+                    clue: "Climb the steps to the lungs of the city. Count the white bell towers rising from the old town.",
+                    q: "How many prominent bell towers do you see?",
+                    ans: "5",
+                    icon: "fa-archway"
+                }
+            ],
+            progress: 0,
+            activeId: null,
+
+            startHunt() {
+                this.showView('screen-quests');
+                this.renderQuests();
+            },
+
+            showView(viewId) {
+                ['screen-start', 'screen-quests', 'screen-claim', 'screen-certificate'].forEach(id => {
+                    document.getElementById(id).classList.add('hidden');
+                });
+                document.getElementById(viewId).classList.remove('hidden');
+            },
+
+            renderQuests() {
+                const container = document.getElementById('quest-container');
+                container.innerHTML = '';
+                
+                this.quests.forEach((q, idx) => {
+                    const isLocked = idx > this.progress;
+                    const isDone = idx < this.progress;
+                    const card = document.createElement('div');
+                    card.className = `quest-card p-4 rounded-lg flex items-center gap-4 ${isLocked ? 'locked' : ''} ${isDone ? 'completed' : ''}`;
+                    card.onclick = () => !isLocked && this.openModal(idx);
+                    
+                    card.innerHTML = `
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${isDone ? 'bg-green-700' : 'bg-yellow-900'} text-white border-2 border-yellow-600 shadow-inner">
+                            <i class="fa-solid ${isDone ? 'fa-check' : q.icon}"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="cinzel font-bold text-yellow-600 text-sm">${q.title}</h4>
+                            <p class="text-[10px] text-stone-500 uppercase tracking-widest"><i class="fa-solid fa-location-dot mr-1"></i> ${q.loc}</p>
+                        </div>
+                        ${!isLocked && !isDone ? '<i class="fa-solid fa-chevron-right text-yellow-700 animate-pulse"></i>' : ''}
+                    `;
+                    container.appendChild(card);
+                });
+
+                document.getElementById('progress-indicator').innerText = `${this.progress} / 7 LEGIONS`;
+            },
+
+            openModal(id) {
+                const q = this.quests[id];
+                this.activeId = id;
+                document.getElementById('modal-loc').innerText = q.loc;
+                document.getElementById('modal-title').innerText = q.title;
+                document.getElementById('modal-desc').innerText = q.clue;
+                document.getElementById('modal-question').innerText = q.q;
+                document.getElementById('answer-input').value = '';
+                document.getElementById('error-txt').classList.add('hidden');
+                document.getElementById('challenge-modal').classList.remove('hidden');
+                document.getElementById('answer-input').focus();
+            },
+
+            closeModal() {
+                document.getElementById('challenge-modal').classList.add('hidden');
+            },
+
+            verifyAnswer() {
+                const val = document.getElementById('answer-input').value.toLowerCase().trim();
+                const correct = this.quests[this.activeId].ans.toLowerCase();
+                
+                if (val.includes(correct)) {
+                    this.progress++;
+                    this.closeModal();
+                    if (this.progress >= this.quests.length) {
+                        this.showView('screen-claim');
+                    } else {
+                        this.renderQuests();
+                        this.vibrate();
+                    }
+                } else {
+                    document.getElementById('error-txt').classList.remove('hidden');
+                    this.vibrate(true);
+                }
+            },
+
+            generateCertificate() {
+                const name = document.getElementById('player-name').value;
+                if (!name) return alert("Soldier, enter your name!");
+                document.getElementById('display-name').innerText = name;
+                this.showView('screen-certificate');
+            },
+
+            vibrate(error = false) {
+                if ("vibrate" in navigator) {
+                    navigator.vibrate(error ? [100, 50, 100] : 50);
+                }
+            }
+        };
+
+        // Handle Enter key on input
+        document.getElementById('answer-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') app.verifyAnswer();
+        });
+    </script>
+</body>
+</html>
