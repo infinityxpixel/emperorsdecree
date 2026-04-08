@@ -44,6 +44,7 @@
             font-family: 'Cinzel', serif;
             transition: all 0.2s ease;
             box-shadow: 0 4px 15px rgba(139, 0, 0, 0.4);
+            cursor: pointer;
         }
 
         .btn-roman:active {
@@ -68,42 +69,90 @@
             filter: grayscale(1);
         }
 
-        /* Animation for gold glow */
-        .glow-gold {
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-        }
-
         /* Modal Overlay */
         .modal-overlay {
             background: rgba(0, 0, 0, 0.95);
             backdrop-filter: blur(5px);
         }
 
-        /* Certificate */
+        /* Certificate Print Optimization for A4 Landscape - Aspect Ratio Preserved */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 0;
+            }
+            body {
+                background: white !important;
+            }
+            body * { visibility: hidden; }
+            #screen-certificate, #screen-certificate * { visibility: visible; }
+            #screen-certificate {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 297mm; /* Exact A4 Width */
+                height: 210mm; /* Exact A4 Height */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: white !important;
+                padding: 0;
+                margin: 0;
+            }
+            .no-print { display: none !important; }
+            .cert-border {
+                border: 12pt double #8b0000 !important;
+                box-shadow: none !important;
+                background: #fdfaf3 !important;
+                /* Fixed Aspect Ratio to prevent stretching */
+                width: 260mm; 
+                height: 180mm;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                margin: auto;
+            }
+            #display-name {
+                font-size: 36pt !important;
+            }
+        }
+
         .cert-border {
             border: 15px double var(--roman-red);
             padding: 30px 15px;
             background: #fdfaf3;
+            aspect-ratio: 1.414 / 1; /* Standard A4 aspect ratio */
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
     </style>
 </head>
 <body class="min-h-screen">
 
     <!-- Header Section -->
-    <header class="sticky top-0 z-30 bg-black/80 backdrop-blur-md border-b border-yellow-900/50 p-4 shadow-xl">
+    <header class="sticky top-0 z-30 bg-black/80 backdrop-blur-md border-b border-yellow-900/50 p-4 shadow-xl no-print">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="cinzel text-xl font-bold text-yellow-600 tracking-tighter">Diocletian's Decree</h1>
-            <div id="progress-indicator" class="text-xs cinzel text-yellow-500 font-bold bg-yellow-900/30 px-3 py-1 rounded-full border border-yellow-700/50">
-                0 / 7 LEGIONS
+            <div class="flex items-center gap-3">
+                <button onclick="app.toggleSupport()" class="text-yellow-700 hover:text-yellow-500 transition-colors">
+                    <i class="fa-solid fa-circle-question text-xl"></i>
+                </button>
+                <div id="progress-indicator" class="text-[10px] cinzel text-yellow-500 font-bold bg-yellow-900/30 px-3 py-1 rounded-full border border-yellow-700/50">
+                    0 / 7 LEGIONS
+                </div>
             </div>
         </div>
     </header>
 
     <main id="main-view" class="max-w-md mx-auto p-4 pb-32">
         <!-- Start Screen -->
-        <div id="screen-start" class="py-12 text-center space-y-8 animate-in fade-in duration-700">
+        <div id="screen-start" class="py-12 text-center space-y-8 animate-in fade-in duration-700 no-print">
             <div class="relative inline-block">
-                <i class="fa-solid fa-helmet-recreant text-8xl text-yellow-600 glow-gold"></i>
+                <i class="fa-solid fa-helmet-recreant text-8xl text-yellow-600"></i>
                 <div class="absolute -bottom-2 -right-2 bg-red-700 p-2 rounded-full border-2 border-yellow-600">
                     <i class="fa-solid fa-scroll text-xl text-white"></i>
                 </div>
@@ -112,38 +161,38 @@
             <div class="space-y-4">
                 <h2 class="cinzel text-4xl font-bold leading-tight uppercase">Enter the <br><span class="text-yellow-600">Labyrinth</span></h2>
                 <p class="text-stone-400 leading-relaxed italic">
-                    Soldier, the Emperor has abdicated, but his Final Decree remains hidden within the stone veins of Split. Prove your worth or perish in the cellars.
+                    Soldier, the Emperor has abdicated, but his Final Decree remains hidden within the stone veins of Split. Prove your worth or perish.
                 </p>
             </div>
 
-            <button onclick="app.startHunt()" class="btn-roman w-full py-5 rounded-lg text-lg font-bold shadow-2xl">
+            <button onclick="app.startHunt()" class="btn-roman w-full py-5 rounded-lg text-lg font-bold">
                 Begin the Campaign
             </button>
         </div>
 
         <!-- Quest List -->
-        <div id="screen-quests" class="hidden space-y-4">
+        <div id="screen-quests" class="hidden space-y-4 no-print">
             <div id="quest-container" class="space-y-4">
                 <!-- Quests injected here -->
             </div>
         </div>
 
         <!-- Certificate Form -->
-        <div id="screen-claim" class="hidden py-10">
+        <div id="screen-claim" class="hidden py-10 no-print">
             <div class="parchment p-8 text-center space-y-6">
                 <h2 class="cinzel text-3xl font-bold uppercase text-red-900">Campaign Victory</h2>
                 <p class="text-stone-800 italic">You have conquered the Palace. State your name to be etched into the eternal stone of Split.</p>
-                <input type="text" id="player-name" placeholder="YOUR NAME" class="w-full bg-white/50 border-b-2 border-red-900 p-4 text-2xl cinzel text-center focus:outline-none placeholder-stone-500 text-black">
+                <input type="text" id="player-name" placeholder="YOUR NAME" class="w-full bg-white/50 border-b-2 border-red-900 p-4 text-2xl cinzel text-center focus:outline-none placeholder-stone-500 text-black uppercase">
                 <button onclick="app.generateCertificate()" class="btn-roman w-full py-4 rounded font-bold shadow-lg">
                     Generate Decree
                 </button>
             </div>
         </div>
 
-        <!-- Final Certificate -->
+        <!-- Final Certificate Section -->
         <div id="screen-certificate" class="hidden py-4 animate-in zoom-in duration-500">
-            <div class="cert-border parchment text-center text-black">
-                <p class="text-[10px] cinzel tracking-widest text-red-800 mb-2">REPUBLIC OF CROATIA • CITY OF SPLIT</p>
+            <div class="cert-border parchment text-center text-black shadow-2xl">
+                <p class="text-[10px] cinzel tracking-widest text-red-800 mb-2 uppercase">Republic of Croatia • City of Split</p>
                 <h2 class="text-2xl font-bold cinzel mb-6 border-b border-black/20 pb-2">Imperial Decree</h2>
                 <p class="text-xs italic mb-4">Be it known to all that</p>
                 <h3 id="display-name" class="text-3xl font-bold cinzel text-red-900 mb-6 uppercase tracking-wider">MARCUS AURELIUS</h3>
@@ -161,14 +210,45 @@
                     </div>
                 </div>
             </div>
-            <button onclick="location.reload()" class="w-full mt-8 text-yellow-700 cinzel font-bold text-sm tracking-widest">
-                <i class="fa-solid fa-rotate-left mr-2"></i> Restart Campaign
-            </button>
+            
+            <!-- Actions at the end -->
+            <div class="space-y-4 mt-8 no-print">
+                <button onclick="window.print()" class="btn-roman w-full py-4 rounded font-bold flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i> Save Certificate (A4 PDF)
+                </button>
+                
+                <a href="https://example.com/support" target="_blank" class="btn-roman w-full py-4 rounded font-bold flex items-center justify-center gap-2 decoration-none no-underline">
+                    <i class="fa-solid fa-hand-holding-heart"></i> Support the Empire
+                </a>
+
+                <button onclick="location.reload()" class="w-full text-yellow-700 cinzel font-bold text-sm tracking-widest">
+                    <i class="fa-solid fa-rotate-left mr-2"></i> Restart Campaign
+                </button>
+            </div>
         </div>
     </main>
 
+    <!-- Support Modal (Top level) -->
+    <div id="support-modal" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="parchment w-full max-w-sm rounded-xl p-8 space-y-6">
+            <h2 class="cinzel text-2xl font-bold text-red-900 border-b border-black/10 pb-2">Imperial Support</h2>
+            <p class="text-stone-800 italic text-sm">Lost in the labyrinth? The Praetorian Guard is here to assist.</p>
+            <div class="space-y-4">
+                <a href="mailto:support@splitquests.com" class="flex items-center gap-4 p-3 bg-black/5 rounded hover:bg-black/10 transition-colors">
+                    <i class="fa-solid fa-envelope text-red-800"></i>
+                    <span class="text-sm font-bold">Summon by Scroll (Email)</span>
+                </a>
+                <a href="https://example.com/help" target="_blank" class="flex items-center gap-4 p-3 bg-black/5 rounded hover:bg-black/10 transition-colors decoration-none">
+                    <i class="fa-solid fa-link text-red-800"></i>
+                    <span class="text-sm font-bold">Imperial Library (Help Center)</span>
+                </a>
+            </div>
+            <button onclick="app.toggleSupport()" class="btn-roman w-full py-3 rounded text-sm">Dismiss Guard</button>
+        </div>
+    </div>
+
     <!-- Challenge Modal -->
-    <div id="challenge-modal" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+    <div id="challenge-modal" class="modal-overlay fixed inset-0 z-50 hidden flex items-center justify-center p-4 no-print">
         <div class="parchment w-full max-w-sm rounded-xl p-6 relative overflow-hidden">
             <div class="absolute top-0 right-0 p-4">
                 <button onclick="app.closeModal()" class="text-black/50 hover:text-black text-2xl">&times;</button>
@@ -179,9 +259,7 @@
                 <h2 id="modal-title" class="cinzel text-xl font-bold text-black border-b border-black/10 pb-2">Quest Title</h2>
             </div>
 
-            <div id="modal-desc" class="text-stone-800 italic text-sm mb-6 leading-relaxed">
-                Clue text goes here...
-            </div>
+            <div id="modal-desc" class="text-stone-800 italic text-sm mb-6 leading-relaxed"></div>
 
             <div class="bg-black/5 p-4 rounded-lg space-y-4">
                 <label id="modal-question" class="block text-[10px] font-bold text-black uppercase tracking-wider">Verification Question</label>
@@ -189,15 +267,10 @@
                 <p id="error-txt" class="text-red-700 text-[10px] font-bold hidden uppercase"><i class="fa-solid fa-circle-exclamation"></i> Incorrect. Observe the monument closely.</p>
             </div>
 
-            <button onclick="app.verifyAnswer()" class="btn-roman w-full mt-6 py-4 rounded-lg font-bold shadow-md">
+            <button onclick="app.verifyAnswer()" class="btn-roman w-full mt-6 py-4 rounded-lg font-bold">
                 Verify Proof
             </button>
         </div>
-    </div>
-
-    <!-- Background Decoration -->
-    <div class="fixed bottom-0 right-0 -z-10 opacity-10 pointer-events-none">
-        <i class="fa-solid fa-columns-3 text-[300px]"></i>
     </div>
 
     <script>
@@ -261,7 +334,7 @@
                     id: 6,
                     title: "Temple of the Hill",
                     loc: "Marjan Viewpoint",
-                    clue: "Ascend the 'Lungs of the City' to look back at the Palace. Ancient Romans once climbed this same hill to offer sacrifices at a temple dedicated to the goddess of the hunt.",
+                    clue: "Ascend the hill to look back at the Palace. Ancient Romans once climbed this same hill to offer sacrifices at a temple dedicated to the goddess of the hunt.",
                     q: "Which Roman Goddess had a temple on Marjan hill?",
                     ans: "diana",
                     icon: "fa-mountain-sun"
@@ -280,6 +353,7 @@
                     document.getElementById(id).classList.add('hidden');
                 });
                 document.getElementById(viewId).classList.remove('hidden');
+                window.scrollTo(0, 0);
             },
 
             renderQuests() {
@@ -301,7 +375,6 @@
                             <h4 class="cinzel font-bold text-yellow-600 text-sm">${q.title}</h4>
                             <p class="text-[10px] text-stone-500 uppercase tracking-widest"><i class="fa-solid fa-location-dot mr-1"></i> ${q.loc}</p>
                         </div>
-                        ${!isLocked && !isDone ? '<i class="fa-solid fa-chevron-right text-yellow-700 animate-pulse"></i>' : ''}
                     `;
                     container.appendChild(card);
                 });
@@ -319,11 +392,15 @@
                 document.getElementById('answer-input').value = '';
                 document.getElementById('error-txt').classList.add('hidden');
                 document.getElementById('challenge-modal').classList.remove('hidden');
-                document.getElementById('answer-input').focus();
             },
 
             closeModal() {
                 document.getElementById('challenge-modal').classList.add('hidden');
+            },
+
+            toggleSupport() {
+                const modal = document.getElementById('support-modal');
+                modal.classList.toggle('hidden');
             },
 
             verifyAnswer() {
@@ -333,33 +410,27 @@
                 if (val.includes(correct)) {
                     this.progress++;
                     this.closeModal();
+                    // Update the visual progress first so the UI reflects 7/7
+                    document.getElementById('progress-indicator').innerText = `${this.progress} / 7 LEGIONS`;
+                    
                     if (this.progress >= this.quests.length) {
                         this.showView('screen-claim');
                     } else {
                         this.renderQuests();
-                        this.vibrate();
                     }
                 } else {
                     document.getElementById('error-txt').classList.remove('hidden');
-                    this.vibrate(true);
                 }
             },
 
             generateCertificate() {
                 const name = document.getElementById('player-name').value;
-                if (!name) return alert("Soldier, enter your name!");
-                document.getElementById('display-name').innerText = name;
+                if (!name) return;
+                document.getElementById('display-name').innerText = name.toUpperCase();
                 this.showView('screen-certificate');
-            },
-
-            vibrate(error = false) {
-                if ("vibrate" in navigator) {
-                    navigator.vibrate(error ? [100, 50, 100] : 50);
-                }
             }
         };
 
-        // Handle Enter key on input
         document.getElementById('answer-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') app.verifyAnswer();
         });
