@@ -90,7 +90,8 @@
         .cert-border {
             border: 15px double var(--roman-red);
             padding: 30px 15px;
-            background: #fdfaf3;
+            background-color: #fdfaf3 !important;
+            background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png") !important;
             aspect-ratio: 1.414 / 1;
             width: 100%;
             max-width: 800px;
@@ -98,6 +99,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            box-sizing: border-box;
         }
 
         .loading-spinner {
@@ -162,8 +164,8 @@
         <div id="screen-paywall" class="hidden py-10 no-print">
             <div class="parchment p-8 text-center space-y-6 rounded-lg">
                 <i class="fa-solid fa-crown text-6xl text-red-900"></i>
-                <h2 class="cinzel text-2xl font-bold uppercase text-red-900">CONGRATULATIONS!</h2>
-                <p class="text-stone-800 italic">You have completed the trials of the commoner. OPTIONAL: To unlock two extra quests and the Imperial Certificate, you must pay tribute to the treasury.</p>
+                <h2 class="cinzel text-2xl font-bold uppercase text-red-900">Legendary Access</h2>
+                <p class="text-stone-800 italic">You have completed the trials of the commoner. To unlock the final legendary secrets and the Imperial Certificate, you must pay tribute to the treasury.</p>
                 <div class="bg-yellow-900/10 p-4 rounded-lg border border-yellow-600/30">
                     <p class="cinzel text-sm font-bold text-red-900">Imperial Tribute</p>
                     <p class="text-2xl font-bold">5.00€</p>
@@ -383,22 +385,25 @@
                 this.showView('screen-certificate');
             },
 
-            // --- PASTE THIS NEW FUNCTION BELOW ---
             downloadPDF() {
                 const element = document.querySelector('.cert-border');
                 const name = document.getElementById('display-name').innerText;
                 const opt = {
-                    margin:       0.5,
-                    filename:     `Imperial_Decree_${name}.pdf`,
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
-                    jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+                    margin: 0,
+                    filename: `Imperial_Decree_${name}.pdf`,
+                    image: { type: 'jpeg', quality: 1.0 },
+                    html2canvas: { 
+                        scale: 3, 
+                        useCORS: true, 
+                        letterRendering: true,
+                        scrollY: 0,
+                        windowWidth: 1000 
+                    },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
                 };
 
-                // New Promise-based usage:
                 html2pdf().set(opt).from(element).save();
             },
-            // -------------------------------------
 
             resetCampaign() {
                 if (confirm("Restart the campaign? Your payment status will be preserved.")) {
