@@ -88,18 +88,18 @@
         }
 
         .cert-border {
-            border: 15px double var(--roman-red);
-            padding: 30px 15px;
+            border: 10px double var(--roman-red);
+            padding: 20px 10px;
             background-color: #fdfaf3 !important;
             background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png") !important;
-            width: 800px;
-            height: 566px;
+            aspect-ratio: 1.414 / 1;
+            width: 100%;
+            max-width: 100%;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
             justify-content: center;
             box-sizing: border-box;
-            position: relative;
         }
 
         .loading-spinner {
@@ -390,17 +390,17 @@
                 const name = document.getElementById('display-name').innerText;
                 
                 const opt = {
-                    margin: [1.1, 0, 0, 0], 
-                    filename: `Imperial_Decree_${name}.pdf`,
-                    image: { type: 'jpeg', quality: 1.0 },
-                    html2canvas: { 
-                        scale: 4,
+                    margin:       0.5,
+                    filename:     `Imperial_Decree_${name}.pdf`,
+                    image:        { type: 'jpeg', quality: 1.0 },
+                    html2canvas:  { 
+                        scale: 3, 
                         useCORS: true, 
                         letterRendering: true,
                         scrollY: 0,
-                        windowWidth: 800
+                        windowWidth: 1000
                     },
-                    jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
                 };
 
                 html2pdf().set(opt).from(element).save();
