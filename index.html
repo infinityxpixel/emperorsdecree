@@ -89,7 +89,7 @@
 
         .cert-border {
             border: 10px double var(--roman-red);
-            padding: 20px 10px;
+            padding: 25px 15px;
             background-color: #fdfaf3 !important;
             background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png") !important;
             aspect-ratio: 1.414 / 1;
@@ -396,28 +396,23 @@
                 const element = document.querySelector('.cert-border');
                 const name = document.getElementById('display-name').innerText;
                 
-                // 1. Apply PDF-only styles
-                element.classList.add('pdf-capture-mode');
-
+                // Set PDF options to force a single, centered page
                 const opt = {
-                    margin:       0,
+                    margin:       0.5, // Creates a nice uniform border around the certificate
                     filename:     `Imperial_Decree_${name}.pdf`,
                     image:        { type: 'jpeg', quality: 1.0 },
                     html2canvas:  { 
-                        scale: 2, 
+                        scale: 3, 
                         useCORS: true, 
                         letterRendering: true,
-                        scrollY: 0,
-                        scrollX: 0,
-                        windowWidth: 1000
+                        width: 800, // Hardcoded width for the capture only
+                        windowWidth: 800
                     },
                     jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
                 };
 
-                // 2. Generate and Clean up
-                html2pdf().set(opt).from(element).toPdf().get('pdf').then(() => {
-                    element.classList.remove('pdf-capture-mode');
-                }).save();
+                // Use the 'img' method to ensure it fits perfectly on one page
+                html2pdf().set(opt).from(element).toContainer().toCanvas().toImg().toPdf().save();
             },
 
             resetCampaign() {
