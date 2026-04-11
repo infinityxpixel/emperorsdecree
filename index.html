@@ -99,7 +99,8 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            box-sizing: border-box;
+            box-sizing: border-box !important; /* Critical to stop the left-side cutoff */
+            overflow: hidden;
         }
 
         .loading-spinner {
@@ -390,7 +391,7 @@
                 const name = document.getElementById('display-name').innerText;
                 
                 const opt = {
-                    margin:       [0.5, 0.5, 0.5, 0.5], // Equal margins to help centering
+                    margin:       [0.5, 0.5], 
                     filename:     `Imperial_Decree_${name}.pdf`,
                     image:        { type: 'jpeg', quality: 1.0 },
                     html2canvas:  { 
@@ -398,13 +399,13 @@
                         useCORS: true, 
                         letterRendering: true,
                         scrollY: 0,
-                        windowWidth: 1000 // Forces a stable width to prevent mobile squishing
+                        scrollX: 0,
+                        x: 0,           
+                        windowWidth: 1000 
                     },
-                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' },
-                    pagebreak:    { mode: 'avoid-all' } // Strictly prevents multi-page splits
+                    jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
                 };
 
-                // The .from().set().save() chain ensures one-page centering
                 html2pdf().set(opt).from(element).save();
             },
 
