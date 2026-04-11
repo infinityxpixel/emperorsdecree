@@ -88,17 +88,19 @@
         }
 
         .cert-border {
-            border: 10px double var(--roman-red);
-            padding: 25px 15px;
+            border: 12px double var(--roman-red);
+            padding: 30px 15px;
             background-color: #fdfaf3 !important;
             background-image: url("https://www.transparenttextures.com/patterns/paper-fibers.png") !important;
             aspect-ratio: 1.414 / 1;
             width: 100%;
+            max-width: 800px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
             justify-content: center;
             box-sizing: border-box !important;
+            overflow: hidden;
         }
 
         /* This class is ONLY for the PDF generator */
@@ -396,23 +398,22 @@
                 const element = document.querySelector('.cert-border');
                 const name = document.getElementById('display-name').innerText;
                 
-                // Set PDF options to force a single, centered page
                 const opt = {
-                    margin:       0.5, // Creates a nice uniform border around the certificate
+                    margin:       2.0, // This shrinks the content to 50-60% of the page size
                     filename:     `Imperial_Decree_${name}.pdf`,
                     image:        { type: 'jpeg', quality: 1.0 },
                     html2canvas:  { 
-                        scale: 3, 
+                        scale: 4,      // High quality scale for the capture
                         useCORS: true, 
                         letterRendering: true,
-                        width: 800, // Hardcoded width for the capture only
-                        windowWidth: 800
+                        scrollY: 0,
+                        scrollX: 0,
+                        windowWidth: 800 
                     },
                     jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
                 };
 
-                // Use the 'img' method to ensure it fits perfectly on one page
-                html2pdf().set(opt).from(element).toContainer().toCanvas().toImg().toPdf().save();
+                html2pdf().set(opt).from(element).save();
             },
 
             resetCampaign() {
