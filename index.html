@@ -163,8 +163,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div id="screen-paywall" class="hidden py-10 no-print">
             <div class="parchment p-8 text-center space-y-6 rounded-lg">
                 <i class="fa-solid fa-crown text-6xl text-red-900"></i>
-                <h2 class="cinzel text-2xl font-bold uppercase text-red-900">CONGRATULATIONS!</h2>
-                <p class="text-stone-800 italic">You have completed the trials of the commoner. OPTIONAL: To unlock two extra quests and the Imperial Certificate, you must pay tribute to the treasury.</p>
+                <h2 class="cinzel text-2xl font-bold uppercase text-red-900">Unlock the Full Journey!</h2>
+                <p class="text-stone-800 italic">To begin the Emperor's scavenger hunt and receive your Imperial Certificate, you must first pay tribute to the treasury.</p>
                 <div class="bg-yellow-900/10 p-4 rounded-lg border border-yellow-600/30">
                     <p class="cinzel text-sm font-bold text-red-900">Imperial Tribute</p>
                     <p class="text-2xl font-bold">5.00€</p>
@@ -296,9 +296,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             },
 
             startHunt() {
-                this.showView('screen-quests');
-                this.renderQuests();
-            },
+    if (!this.isPaid) {
+        this.showView('screen-paywall');
+    } else {
+        this.showView('screen-quests');
+        this.renderQuests();
+    }
+},
 
             showView(viewId) {
                 ['screen-start', 'screen-quests', 'screen-paywall', 'screen-claim', 'screen-certificate', 'screen-processing'].forEach(id => {
@@ -314,8 +318,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 const container = document.getElementById('quest-container');
                 container.innerHTML = '';
                 this.quests.forEach((q, idx) => {
-                    const isPremium = idx >= 5;
-                    const isLocked = (idx > this.progress) || (isPremium && !this.isPaid);
+                    const isPremium = true; // Every quest is now part of the paid experience
+                    const isLocked = !this.isPaid || (idx > this.progress);
                     const isDone = idx < this.progress;
                     
                     const card = document.createElement('div');
@@ -367,13 +371,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     this.progress++;
                     this.closeModal();
                     
-                    if (this.progress === 5 && !this.isPaid) {
-                        this.showView('screen-paywall');
-                    } else if (this.progress >= this.quests.length) {
-                        this.showView('screen-claim');
-                    } else {
-                        this.renderQuests();
-                    }
+                    if (this.progress >= this.quests.length) {
+    this.showView('screen-claim');
+} else {
+    this.renderQuests();
+}
                 } else {
                     document.getElementById('error-txt').classList.remove('hidden');
                 }
